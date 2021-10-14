@@ -1,0 +1,809 @@
+We all know Laravel is an Widely used Open source PHP framework for developing enterprise level web application. This framework use Model View Controller (MVC) architecture coding standard. It has a web development application framework with expressive and elegant syntax. In this post we will describe how to use Laravel framework from scratch for beginners programmer who want to learn this framework from basic level.
+
+    1. Install Laravel Framework
+    2. How to make Mysql Database connection in Laravel
+    3. How to Insert Data into Mysql Table in Laravel
+    4. How to display all data from Mysql table on Web page in Laravel
+    5. How to Update Mysql table data in Laravel
+    6. How to Delete Data from Mysql table in Laravel
+
+
+Install Laravel Framework
+
+
+First we want to know how to install Laravel framework, because it is not easy to install like other framework like Codeginiter. So for install this framework first we want to install Composer Dependency Manager for PHP application. Because by using this manager it can manage it's depency.
+You can find how to install composer and how to install Laravel framework from above video tutorial. So, 
+After installing composer you have to go to open command prompt and write following command.
+
+
+composer
+
+This command will load composer in command prompt window and after this we have to go to folder where we want to install Laravel clone application. 
+After going to directory where we want to install this framework. Now in command prompt we have write following command.
+
+
+composer create-project --prefer-dist laravel/laravel student_crud "5.4.*"
+
+This command will install Laravel clone application in define folder and it will download clone application in student_crud folder and 
+it will take around 5 to 10 minute for complete download.
+After complete download application now we want to run this clone application so we have to go to command prompt and type following command.
+
+
+php artisan serve
+
+After run we will see message like "Laravel development server started" with url, so for run application we have to copy that url in browser. So, this way we can run laravel application in browser.
+
+2. How to make Mysql Database connection Laravel
+
+
+
+For making database connection with Mysql in Laravel so you have to open .env file in your editor.
+
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=homestead
+DB_USERNAME=homestead
+DB_PASSWORD=secret
+
+So you can see this code in your file, so for make database connection you have to change following credential.
+
+
+DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=laravel-testing
+DB_USERNAME=root
+DB_PASSWORD=
+
+After define database credential in this .env file now we want to go to config/database.php file and open this file and change following credential.
+
+
+'mysql' => [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', 'localhost'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'laravel-testing'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ],
+
+Above we have set database connection credential in above file, so this way we can make database connection in Laravel application. 
+After making database connection now we want to create simple table in Mysql database from this laravel application. 
+So first we want to create one model for creating table. So we have go to command prompt and in that we want to write following command.
+
+
+php artisan make:model Student -m
+
+This command will generate migration file for our Crud Operation in database/migrations folder. 
+So we have to open that file in editor and add following code in it.
+
+
+public function up()
+    {
+        Schema::create('students', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('first_name'); //varchar(255)
+            $table->string('last_name');
+            $table->timestamps();
+        });
+    }
+
+After write above code in that migration file now we want to migrate this table into Mysql database, so we have go to command prompt and write following command.
+
+
+php artisan migrate
+
+This command will migrate student table into Mysql database and make student table in mysql database. 
+So this way we can make table in Mysql database from Laravel application.
+
+3. How to Insert Data into Mysql Table in Laravel
+For Insert or Add Data into Mysql table in Laravel application so first we want to create mone view file for form and from that form we can send data to mysql database. So we have go to resources/views/ and here we have create master.blade.php file. Laravel use PHP blade templating for display output on web page. By using blade template we can extend master template from child template. And this blade template engine use .blade.php extension for define it is blade template. So, here we have create master.blade.php file resources/views/ in this folder.
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Laravel CRUD</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/css/bootstrap.css" rel="stylesheet">
+</head>
+<body>
+ 
+<div class="container">
+   @yield('content')
+</div>
+ 
+</body>
+</html>
+
+Now we have create child file resources/views/student folder with name create.blade.php.
+
+
+@extends('master')
+
+@section('content')
+<div class="row">
+ <div class="col-md-12">
+  <br />
+  <h3 aling="center">Add Data</h3>
+  <br />
+  @if(count($errors) > 0)
+  <div class="alert alert-danger">
+   <ul>
+   @foreach($errors->all() as $error)
+    <li>{{$error}}</li>
+   @endforeach
+   </ul>
+  </div>
+  @endif
+  @if(\Session::has('success'))
+  <div class="alert alert-success">
+   <p>{{ \Session::get('success') }}</p>
+  </div>
+  @endif
+
+  <form method="post" action="{{url('student')}}">
+   {{csrf_field()}}
+   <div class="form-group">
+    <input type="text" name="first_name" class="form-control" placeholder="Enter First Name" />
+   </div>
+   <div class="form-group">
+    <input type="text" name="last_name" class="form-control" placeholder="Enter Last Name" />
+   </div>
+   <div class="form-group">
+    <input type="submit" class="btn btn-primary" />
+   </div>
+  </form>
+ </div>
+</div>
+@endsection
+
+This is child template and we have extend master template by using this @extends('master'). Here we have not only make form for send data to student controller but also here we have also display validation errors and success message also by using Laravel blade template.
+After define create view file now we want to display this view file in browser, so we want to create one controller and define route of that controller then after we can display view file in browser. So for create controller we have go to command prompt and write following command.
+
+
+php artisan make:controller StudentController --resource
+
+This command will make student contoller here app/Http/Controllers/StudentController.php with all predefined Crud function, so we have just go to particular method and write code for CRUD operation. We have write following code in two method like Create() and Store(). Create() is for display view file in browser and Store() for insert data into Mysql table.
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Student;
+
+class StudentController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('student.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'first_name'    =>  'required',
+            'last_name'     =>  'required'
+        ]);
+        $student = new Student([
+            'first_name'    =>  $request->get('first_name'),
+            'last_name'     =>  $request->get('last_name')
+        ]);
+        $student->save();
+        return redirect()->route('student.create')->with('success', 'Data Added');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
+}
+
+After this we want to define route of this all StudentController CRUD operation so we have go to routes/web.php file and add following code in it.
+
+
+Route::resource('student', 'StudentController');
+
+Lastly we want to handle Mass Assignment Exception, so we need to go to app/Student.php file and add following code in it.
+
+
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Student extends Model
+{
+    protected $fillable = ['first_name', 'last_name'];
+}
+
+
+How to display all data from Mysql table on Web page in Laravel
+
+After Insert of data into Mysql Database table, now we want to retrieve data from Database and display on web in table format in Laravel framework. So for this first we have create view file in resources/views/student folder with name create.blade.php.
+
+
+@extends('master')
+
+@section('content')
+<div class="row">
+ <div class="col-md-12">
+  <br />
+  <h3 aling="center">Add Data</h3>
+  <br />
+  @if(count($errors) > 0)
+  <div class="alert alert-danger">
+   <ul>
+   @foreach($errors->all() as $error)
+    <li>{{$error}}</li>
+   @endforeach
+   </ul>
+  </div>
+  @endif
+  @if(\Session::has('success'))
+  <div class="alert alert-success">
+   <p>{{ \Session::get('success') }}</p>
+  </div>
+  @endif
+
+  <form method="post" action="{{url('student')}}">
+   {{csrf_field()}}
+   <div class="form-group">
+    <input type="text" name="first_name" class="form-control" placeholder="Enter First Name" />
+   </div>
+   <div class="form-group">
+    <input type="text" name="last_name" class="form-control" placeholder="Enter Last Name" />
+   </div>
+   <div class="form-group">
+    <input type="submit" class="btn btn-primary" />
+   </div>
+  </form>
+ </div>
+</div>
+@endsection
+
+After create view file now we have go to StudentController.php file and in that we have write code in index() method of this Controller which we can below.
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Student;
+
+class StudentController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $students = Student::all()->toArray();
+        return view('student.index', compact('students'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('student.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'first_name'    =>  'required',
+            'last_name'     =>  'required'
+        ]);
+        $student = new Student([
+            'first_name'    =>  $request->get('first_name'),
+            'last_name'     =>  $request->get('last_name')
+        ]);
+        $student->save();
+        return redirect()->route('student.index')->with('success', 'Data Added');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
+}
+
+How to Update Mysql table data in Laravel
+
+For updating Mysql table data first we want to make edit link at index.blade.php
+
+
+@extends('master')
+
+@section('content')
+
+<div class="row">
+ <div class="col-md-12">
+  <br />
+  <h3 align="center">Student Data</h3>
+  <br />
+  @if($message = Session::get('success'))
+  <div class="alert alert-success">
+   <p>{{$message}}</p>
+  </div>
+  @endif
+  <div align="right">
+   <a href="{{route('student.create')}}" class="btn btn-primary">Add</a>
+   <br />
+   <br />
+  </div>
+  <table class="table table-bordered table-striped">
+   <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Edit</th>
+    <th>Delete</th>
+   </tr>
+   @foreach($students as $row)
+   <tr>
+    <td>{{$row['first_name']}}</td>
+    <td>{{$row['last_name']}}</td>
+    <td><a href="{{action('StudentController@edit', $row['id'])}}" class="btn btn-warning">Edit</a></td>
+    <td></td>
+   </tr>
+   @endforeach
+  </table>
+ </div>
+</div>
+
+@endsection
+
+After making edit form link at index page, now we want to create edit form so we have go to resources/views/student folder and create edit.blade.php file. In this file we will load form with particular student data.
+
+
+@extends('master')
+
+@section('content')
+
+<div class="row">
+ <div class="col-md-12">
+  <br />
+  <h3>Edit Record</h3>
+  <br />
+  @if(count($errors) > 0)
+
+  <div class="alert alert-danger">
+         <ul>
+         @foreach($errors->all() as $error)
+          <li>{{$error}}</li>
+         @endforeach
+         </ul>
+  @endif
+  <form method="post" action="{{action('StudentController@update', $id)}}">
+   {{csrf_field()}}
+   <input type="hidden" name="_method" value="PATCH" />
+   <div class="form-group">
+    <input type="text" name="first_name" class="form-control" value="{{$student->first_name}}" placeholder="Enter First Name" />
+   </div>
+   <div class="form-group">
+    <input type="text" name="last_name" class="form-control" value="{{$student->last_name}}" placeholder="Enter Last Name" />
+   </div>
+   <div class="form-group">
+    <input type="submit" class="btn btn-primary" value="Edit" />
+   </div>
+  </form>
+ </div>
+</div>
+
+@endsection
+
+Now we want to load this view file with data on browser, so for this we have go to StudentController.php and in that we have write code in edit() method and update(). Here edit() method will load edit form view file in browser and update() will update edit view file form data.
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Student;
+
+class StudentController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $students = Student::all()->toArray();
+        return view('student.index', compact('students'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('student.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'first_name'    =>  'required',
+            'last_name'     =>  'required'
+        ]);
+        $student = new Student([
+            'first_name'    =>  $request->get('first_name'),
+            'last_name'     =>  $request->get('last_name')
+        ]);
+        $student->save();
+        return redirect()->route('student.index')->with('success', 'Data Added');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $student = Student::find($id);
+        return view('student.edit', compact('student', 'id'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $this->validate($request, [
+            'first_name'    =>  'required',
+            'last_name'     =>  'required'
+        ]);
+        $student = Student::find($id);
+        $student->first_name = $request->get('first_name');
+        $student->last_name = $request->get('last_name');
+        $student->save();
+        return redirect()->route('student.index')->with('success', 'Data Updated');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        //
+    }
+}
+
+
+ How to Delete Data from Mysql table in Laravel
+
+For Delete or Remove data first we want to make delete url in resources/views/student/index.blade.php. 
+Here you can find how we can make delete url for remove data from Mysql table.
+
+
+@extends('master')
+
+@section('content')
+
+<div class="row">
+ <div class="col-md-12">
+  <br />
+  <h3 align="center">Student Data</h3>
+  <br />
+  @if($message = Session::get('success'))
+  <div class="alert alert-success">
+   <p>{{$message}}</p>
+  </div>
+  @endif
+  <div align="right">
+   <a href="{{route('student.create')}}" class="btn btn-primary">Add</a>
+   <br />
+   <br />
+  </div>
+  <table class="table table-bordered table-striped">
+   <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Edit</th>
+    <th>Delete</th>
+   </tr>
+   @foreach($students as $row)
+   <tr>
+    <td>{{$row['first_name']}}</td>
+    <td>{{$row['last_name']}}</td>
+    <td><a href="{{action('StudentController@edit', $row['id'])}}" class="btn btn-warning">Edit</a></td>
+    <td>
+     <form method="post" class="delete_form" action="{{action('StudentController@destroy', $row['id'])}}">
+      {{csrf_field()}}
+      <input type="hidden" name="_method" value="DELETE" />
+      <button type="submit" class="btn btn-danger">Delete</button>
+     </form>
+    </td>
+   </tr>
+   @endforeach
+  </table>
+ </div>
+</div>
+<script>
+$(document).ready(function(){
+ $('.delete_form').on('submit', function(){
+  if(confirm("Are you sure you want to delete it?"))
+  {
+   return true;
+  }
+  else
+  {
+   return false;
+  }
+ });
+});
+</script>
+@endsection
+
+After making of delete link in listing of data and this link has been redirect to app/Http/Controllers/StudentController.php file's destroy() method. 
+This method will delete particular student data based on value of id which we have passed in delete link form submission. 
+Here you can find which code we have write under destroy().
+
+
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Student;
+
+class StudentController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $students = Student::all()->toArray();
+        return view('student.index', compact('students'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('student.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'first_name'    =>  'required',
+            'last_name'     =>  'required'
+        ]);
+        $student = new Student([
+            'first_name'    =>  $request->get('first_name'),
+            'last_name'     =>  $request->get('last_name')
+        ]);
+        $student->save();
+        return redirect()->route('student.index')->with('success', 'Data Added');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show($id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $student = Student::find($id);
+        return view('student.edit', compact('student', 'id'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $this->validate($request, [
+            'first_name'    =>  'required',
+            'last_name'     =>  'required'
+        ]);
+        $student = Student::find($id);
+        $student->first_name = $request->get('first_name');
+        $student->last_name = $request->get('last_name');
+        $student->save();
+        return redirect()->route('student.index')->with('success', 'Data Updated');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $student = Student::find($id);
+        $student->delete();
+        return redirect()->route('student.index')->with('success', 'Data Deleted');
+    }
+}
+
+So, this is simplete CRUD (Create, Read, Update, Delete) application which we have made in Laravel framework.
